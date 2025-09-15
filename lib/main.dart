@@ -1,7 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
-import 'screens/login.dart'; // ← Importa la pantalla de login
+import 'src/screens/login.dart'; // ← Importa la pantalla de login
 
 void main() {
   runApp(const JydacleanApp());
