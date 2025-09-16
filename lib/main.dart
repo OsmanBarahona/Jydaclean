@@ -1,25 +1,23 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
-import 'src/screens/login.dart'; // ← Importa la pantalla de login
+import 'src/screens/login.dart';
 
 void main() {
-  runApp(const JydacleanApp());
+  runApp(const MyApp());
 }
 
-class JydacleanApp extends StatelessWidget {
-  const JydacleanApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Jydaclean',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Poppins',
-      ),
-      home: const LoginScreen(), // ← Usa LoginScreen desde la nueva ubicación
       debugShowCheckedModeBanner: false,
+      title: 'Jydaclean App',
+      theme: ThemeData(
+        primaryColor: const Color(0xFF009CA8),
+        scaffoldBackgroundColor: const Color(0xFF009CA8),
+      ),
+      home: const LoginScreen(), // 👈 Ahora LoginScreen está importado correctamente
     );
   }
 }
