@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'profile.dart'; 
+import 'routes.dart';
 
 class CatalogoScreen extends StatefulWidget {
   const CatalogoScreen({super.key});
@@ -10,18 +10,18 @@ class CatalogoScreen extends StatefulWidget {
 
 class _CatalogoScreenState extends State<CatalogoScreen> {
   final ScrollController _scrollController = ScrollController();
+
   List<Map<String, dynamic>> products = [];
   List<Map<String, dynamic>> filteredProducts = [];
   int loadedItems = 6;
   final int increment = 6;
   String selectedCategory = 'Todos';
   String searchQuery = '';
-  int _currentIndex = 1; // Índice para resaltar Catálogo
+  int _currentIndex = 1;
 
   final List<Map<String, dynamic>> allProducts = List.generate(30, (index) {
     final categories = ['Hogar', 'Negocios', 'Industria'];
     final category = categories[index % categories.length];
-    
     return {
       "name": "Producto ${index + 1}",
       "description": "Descripción del producto ${index + 1} para $category",
@@ -35,7 +35,6 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
   void initState() {
     super.initState();
     _loadProducts();
-
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -63,17 +62,18 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
 
   void _applyFilters() {
     List<Map<String, dynamic>> result = products;
-    
     if (selectedCategory != 'Todos') {
-      result = result.where((product) => product['category'] == selectedCategory).toList();
+      result = result.where((p) => p['category'] == selectedCategory).toList();
     }
-    
     if (searchQuery.isNotEmpty) {
-      result = result.where((product) => 
-          product['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product['description'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      result = result
+          .where((p) =>
+              p['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
+              p['description']
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()))
+          .toList();
     }
-    
     filteredProducts = result;
   }
 
@@ -87,21 +87,24 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
   void _showFilterDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
-          title: const Text('Filtrar Productos', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: const Text('Filtrar Productos',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView(
               shrinkWrap: true,
               children: [
-                const Text('Categorías', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text('Categorías',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 10),
                 ...['Todos', 'Hogar', 'Negocios', 'Industria'].map((category) {
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(category),
-                    trailing: selectedCategory == category 
+                    trailing: selectedCategory == category
                         ? const Icon(Icons.check, color: Color(0xFF009CA8))
                         : null,
                     onTap: () {
@@ -118,9 +121,7 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cerrar'),
             ),
           ],
@@ -129,73 +130,71 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
     );
   }
 
-  // Función para manejar la navegación entre pantallas
   void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-
-    // Navegación entre pantallas
-    if (index == 0) {
-      // Navegar a Inicio
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-    } else if (index == 1) {
-      // Ya estamos en Catálogo,
-    } else if (index == 2) {
-      // Navegar a Solicitudes 
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RequestsScreen()));
-    } else if (index == 3) {
-      // Navegar a Perfil
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PerfilPage()),
-      );
+    setState(() => _currentIndex = index);
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, Routes.home);
+        break;
+      case 1:
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, Routes.notification);
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, Routes.profile);
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF009CA8),
       appBar: AppBar(
         backgroundColor: const Color(0xFF009CA8),
         elevation: 0,
+        title: const Text('Catálogo'),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.white),
+            icon: const Icon(Icons.filter_list),
             onPressed: _showFilterDialog,
-            tooltip: 'Filtrar productos',
           ),
         ],
       ),
       body: Column(
         children: [
+          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               onChanged: _onSearch,
               decoration: InputDecoration(
                 hintText: 'Buscar productos...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
           ),
+
+          // Chip de categoría seleccionada
           if (selectedCategory != 'Todos')
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 children: [
-                  const Text('Filtrado por: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('Filtrado por: ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
                   Chip(
                     label: Text(selectedCategory),
-                    backgroundColor: const Color(0xFF009CA8).withOpacity(0.2),
+                    backgroundColor: Colors.white,
                   ),
                   const Spacer(),
                   TextButton(
@@ -205,14 +204,18 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                         _applyFilters();
                       });
                     },
-                    child: const Text('Limpiar filtro', style: TextStyle(color: Color(0xFF009CA8))),
-                  )
+                    child: const Text('Limpiar filtro',
+                        style: TextStyle(color: Colors.white)),
+                  ),
                 ],
               ),
             ),
           const SizedBox(height: 8),
+
+          // Grid de productos
           Expanded(
             child: RefreshIndicator(
+              color: const Color(0xFF8BC34A),
               onRefresh: () async {
                 await Future.delayed(const Duration(seconds: 1));
                 setState(() {
@@ -226,20 +229,20 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off, size: 64, color: Colors.grey),
+                          Icon(Icons.search_off,
+                              size: 64, color: Colors.white70),
                           SizedBox(height: 16),
-                          Text('No se encontraron productos', 
-                               style: TextStyle(fontSize: 18, color: Colors.grey)),
-                          SizedBox(height: 8),
-                          Text('Intenta con otros términos de búsqueda', 
-                               style: TextStyle(color: Colors.grey)),
+                          Text('No se encontraron productos',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.white70)),
                         ],
                       ),
                     )
                   : GridView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(12),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
@@ -248,43 +251,43 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                       itemCount: filteredProducts.length + 1,
                       itemBuilder: (context, index) {
                         if (index < filteredProducts.length) {
+                          final product = filteredProducts[index];
                           return Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            color: Colors.white,
                             elevation: 3,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(color: Colors.grey.shade200)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
                                   child: ClipRRect(
                                     borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(12),
-                                    ),
-                                    child: Image.network(
-                                      filteredProducts[index]["image"],
-                                      fit: BoxFit.cover,
-                                    ),
+                                        top: Radius.circular(12)),
+                                    child: Image.network(product["image"],
+                                        fit: BoxFit.cover),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    filteredProducts[index]["name"],
+                                    product["name"],
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 14),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                        color: Colors.black87),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
                                   child: Text(
-                                    filteredProducts[index]["price"],
+                                    product["price"],
                                     style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey,
-                                    ),
+                                        fontSize: 13, color: Colors.grey),
                                   ),
                                 ),
                                 Padding(
@@ -293,15 +296,14 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF8BC34A),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      minimumSize: const Size(double.infinity, 36),
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      minimumSize:
+                                          const Size(double.infinity, 36),
                                     ),
                                     onPressed: () {},
-                                    child: const Text(
-                                      "Solicitar",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                    child: const Text("Solicitar",
+                                        style: TextStyle(color: Colors.white)),
                                   ),
                                 ),
                               ],
@@ -309,7 +311,13 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
                           );
                         } else {
                           return loadedItems < allProducts.length
-                              ? const Center(child: CircularProgressIndicator())
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white),
+                                  ),
+                                )
                               : const SizedBox.shrink();
                         }
                       },
@@ -319,27 +327,19 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF009CA8),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF8BC34A), // verde para resaltar
+        unselectedItemColor: Colors.white70, // blanco semitransparente
         currentIndex: _currentIndex,
-        selectedItemColor: const Color(0xFF009CA8),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped, // Usamos la función de navegación
+        onTap: _onItemTapped,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Inicio",
-          ),
+              icon: Icon(Icons.shopping_cart), label: "Catálogo"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: "Catálogo",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: "Solicitudes",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Perfil",
-          ),
+              icon: Icon(Icons.assignment), label: "Solicitudes"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Perfil"),
         ],
       ),
     );

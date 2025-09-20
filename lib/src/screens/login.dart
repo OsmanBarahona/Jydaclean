@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register.dart'; 
-import 'catalogo.dart'; 
+import 'routes.dart'; // Importa las rutas
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -20,11 +19,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _navigateToCatalog() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const CatalogoScreen()),
-    );
+  void _navigateToHome() {
+    Navigator.pushReplacementNamed(context, Routes.home); // Usa rutas con nombre
   }
 
   @override
@@ -97,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  onPressed: _navigateToCatalog, // Navegación al catálogo
+                  onPressed: _navigateToHome,
                   child: const Text("Ingresar", style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
                 const SizedBox(height: 16),
@@ -116,10 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                    );
+                    Navigator.pushNamed(context, Routes.register); // Usa rutas con nombre
                   },
                   child: const Text("Registrarse", style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
